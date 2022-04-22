@@ -3,6 +3,7 @@ import cors from 'cors';
 
 // importando mis rutas
 import userRoutes from '../routes/user';
+import roleRoutes from '../routes/role';
 
 import db from '../db/connection';
 
@@ -11,7 +12,8 @@ class Server {
     private app: Application;
     private port: string;
     private apiPaths = {
-        users: '/api/users'
+        users: '/api/users',
+        roles: '/api/roles'
     }
 
     constructor() {
@@ -32,6 +34,10 @@ class Server {
             await db.authenticate();
             console.log('Database online');
 
+            // sincronizamos las tablas
+            await db.sync({ alter: true });
+            console.log('The database tables were verified to synchronize it to the models!');
+
         } catch ( error ) {
             throw new Error( String(error) );
         }
@@ -48,6 +54,7 @@ class Server {
 
     routes() {
         this.app.use(this.apiPaths.users, userRoutes);
+        this.app.use(this.apiPaths.roles, roleRoutes);
     }
 
     listen() {
